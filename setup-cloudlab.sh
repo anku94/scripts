@@ -8,6 +8,11 @@ function add_host() {
   ~/scripts/mod-config.py --add-item --host cl$2 --hostname $1.utah.cloudlab.us --identityfile ~/.ssh/emu/emu --user ankushj
 }
 
+# $1: node to ssh to, $2: substring in the plugin name
+function vim_disable_plugin() {
+  ssh $1 "sed -e '/.*$2/s/^/\" /g' -i ~/.vimrc"
+}
+
 function setup_node() {
   nid=cl$1
   scp ~/.tmux.conf $nid:~
@@ -24,6 +29,9 @@ EOF
   scp ~/.zhistory $nid:~
   ssh $nid "sudo apt install -y sshfs"
 
+  ssh $nid "sed -e '/.*valloric/s/^/\" /g' -i ~/.vimrc"
+  vim_disable_plugin $nid youcompleteme
+  vim +'PlugInstall --sync' +qa
 }
 
 remove_cloudlab
